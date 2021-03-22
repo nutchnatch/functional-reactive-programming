@@ -1,0 +1,25 @@
+* Flowable
+	- when obervable can emit data in a rate that observer cannot consume in the same rate
+	- in that case, we can use flowable, instead of observables
+
+	+ flowables are observable with the property called back pressure
+	+ we caanot users to slowdown the input, for tath rxjava provides some operators batch data into data chuncks
+		. or image particular time slice so that the consume can consume more easily
+	+ for that we use:
+		. buffer()
+			-> used for gather emissions in specified scope and emit each batch or group as a collection type instead of emitting one item at a time
+			ex: buffer(int cout) - specifies fixed size to batch emissions
+				buffer (int timeSpan) - does time based buffering, passing a particlar time span to the buffer
+				buffer(Observable boundaryIndicator) - used when we already have a time based observable
+		. window
+			-> buffers into other observable, rather than collections
+			-> yields observable of observables
+				every observable caches their emissions for specific scope and then flushes, once subscribed
+			-> instead of wating dor each list or collection to be emitted, we get emissions emediatly as sonn as they become available
+			-> parmeters are similar to buffer
+		. throttleFirst() throttleLast
+			-> excludes or skips some of the emissions when they occur rapidly (they may be unwanted or redundant)
+		. switchMap()
+			-> similar to flatmap, with the difference that it subscribes to the last emitted observable, and disposes the previous one
+			-> by doing that, it allows us to cancel emitting observables, and switching to a new one for preventing redundant processing
+		

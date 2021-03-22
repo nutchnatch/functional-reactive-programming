@@ -1,0 +1,33 @@
+	+ Observable is quite similar to Iterator
+		. Iteratod pulls data from the source
+		. Observable pushes data towards observers, which then operates on the data
+
+		. like java streams, observables can be processed like:
+			observable
+			.map(s -> s + "-transformed")
+			.subscribe(System.out::println())
+
+			-> it is lazy as weel, meaning it does not do anything until terminal operator is executed, in this case until subscribe is called
+				+ after subsruption, it starts executing the pipeline on the element emited by the observable
+				+ unlike steams, data can be got asynchronously
+		. after subsribing an observable, the observer passes on of three types of events (emmiters): onNext, onError, onComplete to the observable
+			* onNext
+				- the first observable passes each item on at a time to the observer using onNext method
+			* onComplete 
+				- tells that no more onNext calls will occur, so the emition of events is now complete
+			* onError
+				- treated as data, errors are communicated up through the chain to the observer, and the observer defines how to handle it
+				- it is a terminal operation, meaning emissions will be finished after it, and onComplete will never be executed then
+			* onSubscribe
+				- is called when an Observer subscribes to an Observable
+			~ for those three operations, we can think about three data channels (Data for onNext, Complete Signal for onComplete, Error signal form onError)
+
+			+ Observabçeencapsulates the stream and data part
+			+ Observer contains the implementation
+
+
+	+ Observable variants
+		* Single
+			. it is helpful when we have a single result
+			. if we are appling an operation that will return a single value, we can use single observable
+			

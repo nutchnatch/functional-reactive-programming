@@ -1,0 +1,55 @@
+* RsjavaOperators
+	+ allows us to transform, modify, merge, reduce data emitted by the source
+	+ and returns a new observable with transformed data
+		. Suppressing operators
+			- suppress the emissions which fails to meet some specific criteria
+				ex: 
+					-> filter(Predicate)
+					-> take (takes a number of emissions)
+					-> skip (skips a number of emissions)
+					-> distinct (suppress the duplicates | emits unique emission)
+					-> elementAt (used to get element present at specified index)
+		. Transforming operators
+			- transforms emissions
+			- the returned observable may or may not be of the same type, compared to the souce one
+				ex:
+					-> map
+					-> cast (cast each upstream emission into a given specific type)
+					-> delay (delay the emission within a specific amount of time)
+					-> delaySubscription (delay susbscription within specified amount od time)
+					-> scan (applies a function to the first emission)
+						Observable.just(1,2,3,4,5,6,7,8,9)
+						scan((x, y) -> x + y)	1  3(1+2)  6(3+3) 10(6+4)
+					-> sorted (sort all emissions from upstream observable) with natural order or other we specify
+					-> repeat (repeats subscription upstream by the specified number of items)
+		. Reducing operators
+			- takes a series of emissions and reduce them into a single emission
+			- work with finite observables
+				ex:
+					-> count (counts the number of emission)
+					-> reduce (identical to scan, but emits the final accumulation)
+					-> contains (checks if the specified elements is emited by the upstream, or not) 
+					-> all (verifies that each emission is satisfying the specified condition, or not)
+					-> any (verifies weather anu emission is satisfying the specified condition, or not)
+		. Collection operator
+			- combines all emissions from uostream to some collection, like list or map
+				ex:
+					-> toList
+					-> toSortedList
+					-> toMap
+					-> collect
+		. Error-recovery operators
+			- used to handle errors and recover from them
+			- onError (communicates error to observer, directly)
+				ex:
+					-> onErrorReturnItem
+					-> onErrorReturn (used to emits multiple values, instead of single when exception occurs. It takes a lambda to yeld a default element)
+					-> onErrorResumeNext (emit multiple values instead of single when exception occurs)
+					-> retry (re-subscribes to the observable hoping it will complete without any error)
+		. Action operator 
+			- used to debug in the observable chain
+				ex:
+					-> doOnNext()
+					-> doOnError()
+					-> doOnSubscribe
+					-> doOnComplete

@@ -1,0 +1,46 @@
+* Merge and concat multiple observables
+	+ merging the emission of multiples observables to have a single observable source
+
+	* Merge
+		- takes two observables or other combination to merge observables
+	* Concat
+		- unlike merge, concat maintains the sequential order
+			. if we pass source1 first, we will get the emissions for source one in the resulting observable and then emission for source2
+		- just like for merge, we have a lot of overload for concat
+			. minumum of two observables to a maximum of four observables
+
+		- flaMap
+			. concatenates emissions
+			. takes each emission or each element and then break it up im multiple elements and returns an observable having those elements
+			. finally, when er get all observables corresponding to each element, the merging happens
+			. flatMap takes all those observables returned by each element, and flatten them or merge them a single observable, having all emissions created observables
+			. as it is a merging operation, we will get the emissions in interleaved fashion
+			. if we compare this flatMap operation with normal map operation
+				+ map takes a mapper that directly returns a single value, against each emission
+				+ when all elements are processed, finally we get a stream or observables having all the return elements
+				+ flatMap takes a map, but this mapper returns an observable against each single value, and when all values or emissions are processed, finally it merges all emissions os those observables, and we get a single observable
+		- concatMap
+			. concatenate observables
+			. it is just like flatMap, differentiating when the observables will be in sequential fashion, as it is a concatenation operation
+
+	* amb (ambiguous)
+			. takes an iterable 
+			. takes observable sources, and return +s an iterable
+			. takes the fastest observable
+
+	* zip
+		. takes observables to be ziped and zip function
+		. it can take from two to nine observables, so it has so many overloads
+		. takes an emition from each observable source, and combine them into a single emition
+		. zip returns an observable that applies a function of your choice to combine the emitted items
+	* combineLatest
+		. quite identical to zip, it combines emissions in one to one pairing, just like zip, the difference is that, one resource emission never waits for other resource to emit new emissions
+		. it just pairs with the latest emission from the resource
+		. the latest value is cached until the next element of other source comes up
+
+	* grouping and grouped observables
+		. groups emissions by specific key into separate observables
+		. grupBy
+			+ takes a lambda to map emissions to a certain key
+			+ group those emissions as per our key selector, which is passed in
+			+ then it emits grouped items as grouped observables

@@ -1,0 +1,40 @@
+* Replying and Caching
+	+ how to replay emissions from the start
+	+ source.replay()
+		. replay method returns a connectable observer
+		. which is a current subscription to the current observable that will replay all items and notifications to any future observer
+		. connected observable does not wait for any subscription
+			- it get started when we get connected method
+			- when observer 1 connects, observable emits the items
+			- when observer 2 connects, observable replay the items
+		. source.replay() is a pwerful way to hold on to previous emissions within a certain scope and re-emit them when a new observer comes
+
+	+ caching 
+		. it is almost identical to replay when we use replay operator
+		. it get subscribed automatically when an observer comes
+		. it will cache the data to be replayed to all other observers downstream
+
+
+* Subject
+	+ is a kind of bothe Observer and Observable and can work as both
+	+ it can observe data from multiple sources and emit data to multiple observers
+	+ it implements both Observer<T> and Observable<T> interface simultaneously
+	+ so, it is suitable for bothe output and input
+	+ it can multicast too - all subscribed observers will receive the same emissions, from the point where they have subscribed
+
+	+ Multiple typs of subjects:
+		- Publishsubject
+			-> most basic, it starts emiting from the moment observers subscribe it, the observer will miss the previous emissions, until then
+			- ex: tv
+		- ReplaySubject
+			-> emits all items of source observable, regardless of what the subscriber subscribes
+			- it is a PublishSubject with a cache  operator
+			- ex: youtube
+		- BehaviorSubject
+			-> emits the most recent item with the subsequent items of the rouce observable from the point of subcrption 
+		- AsyncSubject
+			-> emits only the last value of the source observable, after invoking complete action
+		- UnicastSubject
+			-> buffers all emissions 
+			- when it is subscribed it releases all buffered emissions and clears its cache
+			- it just allows one observer

@@ -1,0 +1,68 @@
+* How can we add concurrency in our synchronized observable chains
+* The real power of rxjava is making the code async
+
+* Observable Contract
+	+ emissions must be passed sequentially and one at a time
+	+ cannot be passed concorently or in parallel
+
+* Schedullers
+	+ Computation scheduler
+		. Schedulers.computation()
+		. it is for computation intensive tasks
+		. maintains a fixed number of threads, which is equal to the number of cpus or cores available (Runtime.getRuntime().available()Processors())
+		. there is no benefit in having more worker threads, than available cores to perform such a work
+		. if we don't follow this principle, we may have performance issues
+
+	+ IO Scheduler
+		. just like for computation scheduler is dedicated for intensive tasks, this scheduler is for io intensive jobs
+		. Schedulers.io()
+		. for example, an io bound operation like any file operation, database operation, http call where threads are free halph the time, because they wait for the data to be sent, or come back
+		. in this case, threads may be greater than numbers of cores (or cpu)
+		.io scheduler will maintain as many threads, as thre are many tasks
+		. and will dinamically grows cache and reduce the number of threads as needed.
+
+	+ New Thread Scheduler
+		. Schedulers.newThread() - this is a factory thT creates a new thread for each observer and then, destroy the thread when it is done
+		. this is different form other scheduler above, because those create a pool of threads and reuse them, so they are not dead or terminated when they complete their task
+
+	+ Single Scheduler
+		. Schedulers.single()
+		. it is helpful for performing non-thread save operations to a single thread
+		. so, one thread is responsible to perform all the tasks by all the observers, sequentially
+
+	+ Trampolin Scheduler
+		. Schedulers.trampoline()
+		. in pratical, you will not invoke it often, as it is primarily in rxjava's internal implementation
+		. it is a default scheduling on immediate thread, but it prevents cases of recursive scheduling where a task schedule a task while on the same thread, instead oif causeing a stack overflow error
+
+	+ Scheduler From
+		. Schedulers.from()
+		. used to create a custom scheduler, by passing a standard java executor service
+
+	~ when there are more than a subscribeOn or observeOn(), the position matters
+		- prefer to call subscribeOn as close to the source as possible
+
+	~ If we want to change scheduler in the middle of observable chais, subscribeOn cannot help us
+		* here is where we use observeon()
+		* observeOn()
+			+ it intercepts the emission at the point where it is placed in the observable chain, and switch them to a different scheduler going forward
+			+ unlike subscribeOn, the placement of observeOn matters
+			+ upstream operators before observeOn are not impacted, but downstream will use the scheduler provided by observeOn 
+			+ There are performance implication with observe on:
+				. observeOn does not wait for this element to complete the chain
+				. in meanwhile new element reached observeOn, and it emits it without waiting for the downstream to finich the current one
+				. this is called producer-consumer problem, where producer is producing emissions faster the consumer is consuming elements
+				. if this happens, then emissions will be queued on, on observeOn until downstream is able to process all the elements
+				. but this can lead to memory issues, if we have a lot of elements
+				. in such situations, we avoid creating observsbles, instead we use flowable which supports backpressure
+
+	~ we cannot run emition concurrently on a single observer, as it breaches the observable contract
+		. what if we create multiple observables out of these emissions and then run them parallelly using flapMap operator?
+		. each one having its own thread pushing items trough
+
+
+
+		J'ai reçu le notification de livraison de ma demande, avec le Number:
+8K02389128269, mais l'adresse de livraison peut être incomplète.
+
+C'est un boîte de 2 poids avec quatre bouteille.

@@ -1,0 +1,129 @@
+* Reactive 
+	- One who reacts
+	- Paradigms of programming:
+		* Procedural
+		* Object oriented
+		* Functional
+		* Reactive
+			-> to meet modern demands, and to exceeds users exceptation, a system should be responsive, resilient, message driven and should be elastic
+				* Responsive
+					+  there should be an upper limit of response time of an application, and app should return back with a defined time limit.
+					+  ex: in order to respond to a computation intensive report, we can do:
+						- go parallel - put many resources in parallel to respond to gernerate the report
+						- after receiving hte request, responde back with a message, that we are creating the report and a mail with link will bne sent, in order to collect the report
+							* in this case, the request will be sent asynchronously to a queue, and when ready, send the report 
+				* Resilient
+					-> errors are not second class
+					->  as data, erros and faillures are first class citizens 
+				* Elastic
+					->  when load increase, your system should be able to scale up and down, in order to respond
+				* Message driven
+					-> the system should achieve loose copling, where components should talk asynchronously to each other
+	- Started at netflix, the JVM extension for reactive x is  RxJava, most recent version is 3.0
+
+	- We can manage asynchronous programming using callbacks, but they might get hard to manage, and become a callback hell
+	- RxJava solves this problem by using Observable design pattern
+	- In RxJava, everything is push based (while the standard models are pull based) 
+		* RxJava makes it very simºle, by handling callbacks with obervables
+
+* Observable pattern
+	+ Observer is someone who watches or notices something
+	+ Subject 
+		-> maintain a list of ependent objects, known as Observers 
+	+ Define one to many dependencies between objects
+		-> one object (Subject) changes its state , all of its dependent objects get notified or updated automatically
+		-> once observers get notified by Subject, they are ready to get the same update
+
+	* Class diagram 
+
+							observer
+			<<nterface>> --------------> <<interface>>
+			   Subject		1...*			Observer
+	(registerObserver(Observer))			(update())
+	(removeObserver(Observer))
+		notifyObserver()
+
+				^								^
+				|								|
+				|								|
+				|								|
+
+			ConcreteSubject				ConcretObserver
+		(registerOserver(Observer))		   (update())
+		(removeOserver(Observer))				|
+												|
+				|_______________________________|								
+
+		+ Concrete observer maintain a reference to concrete subject and implements the Observer interface
+		+ Each observer registers itself with a concrete Subject, in order to receive the updates 
+
+
+	* Sequence diagram (how they with eacj+h other at runtime?)
+
+		Observer1				Observer2				Subject
+			|---------------------------------------------->|
+			|registerObserver(obs1)	|						|
+			|						|---------------------->|					
+			|						|registerObserver(obs2) |	setState()
+			|						|						| <----------
+			|						|						| ------>|
+			|						|						| 		 | notify()
+			|						|						| <------|
+			|		update()		|						|
+			|<---------------------------------------------	|
+			|						|		getStatus()     |
+			|---------------------------------------------->|
+			|						|		update()        |
+			|						|<----------------------|
+			|						|		getStatus()		|
+			|						|---------------------->|
+
+		* after observer registration, Subject updates the registered observers when any state change happen (done by an external object)
+		* when Subject state changes, it calls notify() method on itself
+			- notify calls update on registered  observers
+			- observers then request chanchedData(), by using getState from Subject to update their state
+
+
+	* Concurrency vs Parallel programming
+		+ Concurrency / Multithreading is to run multiple parts of the program in a single CPU, but using different threads
+			- bring responsiveness
+			- CPU schedule threads internaly, by applying algorithms like time slicing
+			-is when more than one task can start and complete in overlapping time periods
+			- it does not necessarily mean, they are running at the same instant
+			- it is multitasking in a single core machine
+		+ Parallelism is when tasks run at same time
+			- for ex, on a multicore processor, the taks is split up to be processed by different cores or CPU, and after completion,
+			all the partial results, are merged to get a single result.
+			- or when tasks are independent, abd are run on different CPUs and then complete 
+			- in java we can create multithreads to achieve multithreading, and we can use fork-join pool for parallel programming
+			- using java core, it is not easy to achieve both
+			- this can be done more easily, using rxjava
+			- rxjava provides the schedulers and better support for concurrency and parallelism
+
+	* Properties
+		+ rxjava works on push rather than pull
+			-> events (data error, complete signal) are pushed to observers
+			-> this behavior is asynchronous, as it is a kind of callback
+		+ rxjava uses different channels for different signals (complete signal, error signal)
+			-> to make the application more resilient, as errors are treated as a separate channel, so we can treat error just like data
+		+ rxjava use operators for processing and combining events
+			-> using operators, we can achieve  easily achieve parallelism
+		+ schedulers - to support parallel programming, rxjava uses a different of schedullers like IO intensive computation
+			-> it does the heavy lifting of parallel programming and enables us to focus on business logic
+		+ backpressure - rxjava is backpressure ready to control produce-consumer problem
+			-> if producer is producing at high speed, so that consumer is not able to consume all the items at that speed or vice versa and rxjava can handle that condition using backpressure techniques
+			-> this is the high level overview of how we can solve some fundamental with rxjava
+
+	* Reactive Streams (rxjava 3.x)
+		+ with rxjava, java came up with interfaces called reactive streams
+		+ Technology Compatibility Kit (TCK) - reactive streams implementation
+			. this API uses Flwableinstead of Observables
+			. before reactive stremas, rxjava already existed
+			.java9 implements tck and has flowable api for reactive programming
+			. rxjava and java9's flowable are interopables
+				- if you are using rxjava (latest version), it can be replaced by java9 flowable and vice versa
+			. reactor core is another reactive api that can be used
+			. difference between java9's flowable and rx java (observable) is that flowables are backpressure and observable is not 
+
+
+
